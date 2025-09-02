@@ -10,8 +10,8 @@ from lm_client import classify_with_lmstudio, detect_language_with_lmstudio
 from deep_learning_detector import analyze_code_deep_learning
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'
-app.config['DATABASE'] = 'database.sqlite3'
+app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')
+app.config['DATABASE'] = os.environ.get('DATABASE_PATH', 'database.sqlite3')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Allowed file extensions
@@ -321,4 +321,6 @@ def remove_uploaded_file(file_id):
         return jsonify({'success': False, 'message': f'Error removing file: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    debug_flag = os.environ.get('FLASK_DEBUG', '0') == '1'
+    port = int(os.environ.get('PORT', '5000'))
+    app.run(host='0.0.0.0', port=port, debug=debug_flag)
